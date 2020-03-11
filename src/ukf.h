@@ -1,6 +1,10 @@
 #ifndef UKF_H
 #define UKF_H
 
+#include <iostream>
+// #include <xmmintrin.h>  // DEBUG NON-PORTABLE for NaN
+#include <cmath>
+
 #include "Eigen/Dense"
 #include "measurement_package.h"
 
@@ -17,10 +21,9 @@ class UKF {
   virtual ~UKF();
 
   /**
-   * ProcessMeasurement
-   * @param meas_package The latest measurement data of either radar or laser
+   * InitializeUKF initializes the UKF instance
    */
-  void ProcessMeasurement(MeasurementPackage meas_package);
+  void InitializeUKF(MeasurementPackage meas_package);
 
   /**
    * Prediction Predicts sigma points, the state, and the state covariance
@@ -28,6 +31,12 @@ class UKF {
    * @param delta_t Time between k and k+1 in s
    */
   void Prediction(double delta_t);
+
+  /**
+   * ProcessMeasurement
+   * @param meas_package The latest measurement data of either radar or laser
+   */
+  void ProcessMeasurement(MeasurementPackage meas_package);
 
   /**
    * Updates the state and the state covariance matrix using a laser measurement
@@ -60,6 +69,9 @@ class UKF {
   // predicted sigma points matrix
   Eigen::MatrixXd Xsig_pred_;
 
+  // Weights of sigma points
+  Eigen::VectorXd weights_;
+
   // time when the state is true, in us
   long long time_us_;
 
@@ -84,17 +96,18 @@ class UKF {
   // Radar measurement noise standard deviation radius change in m/s
   double std_radrd_ ;
 
-  // Weights of sigma points
-  Eigen::VectorXd weights_;
-
   // State dimension
   int n_x_;
 
   // Augmented state dimension
   int n_aug_;
 
+  // Number of sigma points
+  int n_sig_;
+
   // Sigma point spreading parameter
   double lambda_;
+
 };
 
 #endif  // UKF_H
